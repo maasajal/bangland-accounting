@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import PersonalInfo from "./form-sections/PersonalInfo";
 import BusinessInfo from "./form-sections/BusinessInfo";
-import AddressInfo from "./form-sections/AddressInfo";
 import BankInfo from "./form-sections/BankInfo";
 import PricingPlan from "./form-sections/PricingPlan";
 import { IClientForm } from "@/types/client";
@@ -30,7 +29,6 @@ interface ClientFormProps {
 const steps = [
   "Personal Information",
   "Business Information",
-  "Address Details",
   "Bank Information",
   "Pricing Plan",
 ];
@@ -38,7 +36,7 @@ const steps = [
 const schema = yup.object().shape({
   personal: yup.object().shape({
     first_name: yup.string().required("First name is required"),
-    last_name: yup.string().required("Last name is required"),
+    last_name: yup.string(),
     ssn: yup.string().required("SSN is required"),
     email: yup
       .string()
@@ -49,24 +47,31 @@ const schema = yup.object().shape({
     about_client: yup.string(),
   }),
   business: yup.object().shape({
+    business_type: yup.string().oneOf(["yes", "no"]),
     business_id: yup.string(),
     vat_id: yup.string(),
-    company: yup.string().required("Company name is required"),
+    company: yup.string(),
     business_desc: yup.string(),
-    vat_return_activities: yup
-      .string()
-      .required("VAT return frequency is required"),
-    business_start_date: yup.date().required("Business start date is required"),
+    vat_return_activities: yup.string(),
+    business_start_date: yup.date(),
   }),
   address: yup.object().shape({
     full_address: yup.string().required("Full address is required"),
   }),
   bank: yup.object().shape({
-    bank_name: yup.string().required("Bank name is required"),
-    bank_account_no: yup.string().required("Bank account number is required"),
-    bic: yup.string().required("BIC/SWIFT code is required"),
+    bank_name: yup.string(),
+    bank_account_no: yup.string(),
+    bic: yup.string(),
   }),
   pricing_plan: yup.string().required("Please select a pricing plan"),
+  work_contracts: yup
+    .array()
+    .min(1, "Please select at least one work contract status"),
+  work_contracts_other: yup.string().when("work_contracts", {
+    is: (work_contracts: string[]) => work_contracts?.includes("Other"),
+    then: (schema) => schema.required("Please specify your work contract"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
   agree_with: yup.object().shape({
     terms_conditions: yup.object().shape({
       i_agree: yup
@@ -75,6 +80,7 @@ const schema = yup.object().shape({
       confirm: yup.boolean().oneOf([true], "You must confirm the agreement"),
     }),
   }),
+  digital_sign: yup.string(),
 });
 
 export default function ClientForm({ onSuccess }: ClientFormProps) {
@@ -88,6 +94,7 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
     formState: { errors },
     trigger,
     watch,
+    setValue,
   } = useForm<IClientForm>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -104,6 +111,7 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
         about_client: "",
       },
       business: {
+        business_type: "no",
         business_id: "",
         vat_id: "",
         company: "",
@@ -128,8 +136,8 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
         comment: "",
         discount: "",
         terms_conditions: {
-          i_agree: false,
-          confirm: false,
+          i_agree: true,
+          confirm: true,
         },
       },
       digital_sign: "",
@@ -157,12 +165,9 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
         ];
         break;
       case 2:
-        fields = ["address.full_address"];
-        break;
-      case 3:
         fields = ["bank.bank_name", "bank.bank_account_no", "bank.bic"];
         break;
-      case 4:
+      case 3:
         fields = [
           "pricing_plan",
           "agree_with.terms_conditions.i_agree",
@@ -171,7 +176,7 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
         break;
     }
 
-    const isValid = await trigger(fields as any);
+    const isValid = await trigger(fields as unknown);
     if (isValid) {
       setActiveStep((prev) => prev + 1);
       setSubmitError("");
@@ -234,11 +239,23 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
       case 1:
         return <BusinessInfo control={control} errors={errors} />;
       case 2:
-        return <AddressInfo control={control} errors={errors} />;
+        return (
+          <BankInfo
+            control={control}
+            errors={errors}
+            watch={watch}
+            setValue={setValue}
+          />
+        );
       case 3:
-        return <BankInfo control={control} errors={errors} />;
-      case 4:
-        return <PricingPlan control={control} errors={errors} watch={watch} />;
+        return (
+          <PricingPlan
+            control={control}
+            errors={errors}
+            watch={watch}
+            setValue={setValue}
+          />
+        );
       default:
         return null;
     }

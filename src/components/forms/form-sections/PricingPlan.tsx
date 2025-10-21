@@ -1,77 +1,38 @@
 // src/components/forms/form-sections/PricingPlan.tsx
 "use client";
 
-import { FieldErrors, UseFormWatch } from "react-hook-form";
+import { Control, FieldErrors, UseFormWatch } from "react-hook-form";
 import {
-  Grid,
   FormControl,
   FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   Typography,
   Box,
-  Card,
-  CardContent,
   Alert,
   FormGroup,
   Checkbox,
   FormHelperText,
   TextField,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
 } from "@mui/material";
 import { IClientForm } from "@/types/client";
-import AgreementSection from "@/components/sections/AgreementSection";
+import pricingData from "@/data/pricingPlans.json";
 
 interface PricingPlanProps {
-  control: any;
+  control: Control<IClientForm>;
   errors: FieldErrors<IClientForm>;
   watch: UseFormWatch<IClientForm>;
 }
 
-const pricingPlans = [
-  {
-    value: "light_startup_yearly",
-    label: "Most wanted Light & Startup Entrepreneur",
-    price: "€30/month",
-    description: "Yearly subscription (Best value)",
-    popular: true,
-  },
-  {
-    value: "light_startup_monthly",
-    label: "Light & Startup Entrepreneur",
-    price: "€39/month",
-    description: "Monthly subscription",
-  },
-  {
-    value: "taxi_driver",
-    label: "For Taxi driver",
-    price: "€49/month",
-    description: "Fixed monthly price",
-  },
-  {
-    value: "pro_light",
-    label: "Pro Light Entrepreneur",
-    price: "0.99% of gross salary",
-    description: "Food delivery only",
-  },
-  {
-    value: "light_basic",
-    label: "Light Entrepreneur Basic",
-    price: "3.99% of gross salary",
-    description: "6-month commitment required",
-  },
-  {
-    value: "llc_under_100k",
-    label: "Limited Liability Company (Up to €100K Turnover)",
-    price: "€49-99/month",
-    description: "Depending on company status and sales turnover",
-  },
-  {
-    value: "llc_over_100k",
-    label: "Limited Liability Company (Over €100K Turnover)",
-    price: "€99-199/month",
-    description: "Depending on company status and sales turnover",
-  },
+const workContracts = [
+  "I have own Wolt/Foodora ID",
+  "I am a substitute of Wolt/Foodora",
+  "My Wolt/Foodora ID is temporary",
+  "I am looking for a food delivery ID",
+  "I have a Taxi business",
+  "I am a Taxi driver",
+  "Other",
 ];
 
 export default function PricingPlan({
@@ -80,6 +41,8 @@ export default function PricingPlan({
   watch,
 }: PricingPlanProps) {
   const watchTerms = watch("agree_with.terms_conditions");
+  const selectedWorkContracts = watch("work_contracts") || [];
+  const showOtherInput = selectedWorkContracts.includes("Other");
 
   return (
     <Box>
@@ -91,90 +54,193 @@ export default function PricingPlan({
         Select Your Pricing Plan & Agreement
       </Typography>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        💰 All plans include extra deductible VAT of 25.50%
-      </Alert>
+      {/* Work Contracts Status */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+          What is your Work Contracts status right now?
+        </Typography>
+
+        <FormControl
+          component="fieldset"
+          error={!!errors.work_contracts}
+          fullWidth
+        >
+          <FormGroup>
+            {workContracts.map((contract) => (
+              <FormControlLabel
+                key={contract}
+                control={
+                  <Checkbox
+                    {...control.register("work_contracts")}
+                    value={contract}
+                  />
+                }
+                label={contract}
+                sx={{
+                  mb: 1,
+                  p: 1,
+                  borderRadius: 1,
+                  "&:hover": {
+                    backgroundColor: "action.hover",
+                  },
+                }}
+              />
+            ))}
+          </FormGroup>
+          {errors.work_contracts && (
+            <FormHelperText error>
+              {errors.work_contracts.message}
+            </FormHelperText>
+          )}
+        </FormControl>
+
+        {/* Other Work Contract Input */}
+        {showOtherInput && (
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              {...control.register("work_contracts_other")}
+              label="Please specify other work contract"
+              fullWidth
+              variant="filled"
+              placeholder="Describe your work contract situation..."
+              helperText="Tell us about your specific work contract or employment situation"
+            />
+          </Box>
+        )}
+      </Box>
 
       {/* Pricing Plans */}
-      <FormControl
-        component="fieldset"
-        error={!!errors.pricing_plan}
-        fullWidth
-        sx={{ mb: 4 }}
-      >
+      <Box sx={{ mb: 4 }}>
         <FormLabel
           component="legend"
-          sx={{ mb: 2, fontWeight: "bold", fontSize: "1.1rem" }}
+          sx={{
+            mb: 2,
+            fontWeight: "bold",
+            fontSize: "1.1rem",
+            display: "block",
+          }}
         >
-          Choose your preferred pricing plan
+          Choose your preferred pricing plan *
         </FormLabel>
 
-        <RadioGroup
-          {...control.register("pricing_plan")}
-          aria-label="pricing-plan"
+        <Alert severity="info" sx={{ mb: 3 }}>
+          💰 All plans include extra deductible VAT of 25.50%
+        </Alert>
+
+        <FormControl
+          component="fieldset"
+          error={!!errors.pricing_plan}
+          fullWidth
+          sx={{ mb: 3 }}
         >
-          <Grid container spacing={2}>
-            {pricingPlans.map((plan) => (
-              <Grid item xs={12} key={plan.value}>
-                <Card
-                  variant="outlined"
+          <FormLabel
+            component="legend"
+            sx={{ mb: 2, fontWeight: "bold", fontSize: "1rem" }}
+          >
+            Select Pricing Plan *
+          </FormLabel>
+
+          <RadioGroup
+            {...control.register("pricing_plan")}
+            aria-label="pricing-plan"
+          >
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "1fr 1fr",
+                },
+                gap: 1.5,
+              }}
+            >
+              {pricingData.pricingPlans.map((plan) => (
+                <Box
+                  key={plan.value}
                   sx={{
-                    border: "2px solid",
-                    borderColor: plan.popular ? "primary.main" : "divider",
+                    p: 2,
+                    border: "1.5px solid",
+                    borderColor: plan.popular ? "primary.main" : "grey.200",
+                    borderRadius: 1.5,
                     backgroundColor: plan.popular
                       ? "primary.50"
-                      : "background.paper",
-                    transition: "all 0.2s",
+                      : "transparent",
+                    transition: "all 0.15s ease",
                     "&:hover": {
                       borderColor: "primary.main",
-                      backgroundColor: "primary.50",
+                      backgroundColor: plan.popular ? "primary.100" : "grey.50",
                     },
                   }}
                 >
-                  <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-                    <FormControlLabel
-                      value={plan.value}
-                      control={<Radio />}
-                      label={
-                        <Box sx={{ ml: 1 }}>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            {plan.label}
-                            {plan.popular && (
-                              <Typography
-                                component="span"
-                                variant="caption"
-                                color="primary"
-                                sx={{ ml: 1, fontWeight: "bold" }}
-                              >
-                                🏆 MOST POPULAR
-                              </Typography>
-                            )}
+                  <FormControlLabel
+                    value={plan.value}
+                    control={<Radio size="small" />}
+                    label={
+                      <Box
+                        sx={{
+                          ml: 1,
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          minHeight: "100%",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center", // Changed from flex-start to center
+                            gap: 1,
+                          }}
+                        >
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight="600"
+                            sx={{ lineHeight: 1.2 }}
+                          >
+                            {plan.name}
                           </Typography>
                           <Typography
-                            variant="body1"
+                            variant="body2"
                             color="primary"
-                            fontWeight="medium"
+                            fontWeight="bold"
                           >
                             {plan.price}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {plan.description}
-                          </Typography>
                         </Box>
-                      }
-                      sx={{ width: "100%", m: 0 }}
-                    />
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </RadioGroup>
+                        {plan.popular && (
+                          <Typography
+                            variant="caption"
+                            color="primary"
+                            sx={{
+                              fontWeight: "bold",
+                              display: "inline-block",
+                              mt: 0.5,
+                            }}
+                          >
+                            ★ Popular
+                          </Typography>
+                        )}
+                      </Box>
+                    }
+                    sx={{
+                      width: "100%",
+                      m: 0,
+                      alignItems: "center", // This is key - changed from flex-start to center
+                    }}
+                  />
+                </Box>
+              ))}
+            </Box>
+          </RadioGroup>
 
-        {errors.pricing_plan && (
-          <FormHelperText error>{errors.pricing_plan.message}</FormHelperText>
-        )}
-      </FormControl>
+          {errors.pricing_plan && (
+            <FormHelperText error sx={{ mt: 1 }}>
+              {errors.pricing_plan.message}
+            </FormHelperText>
+          )}
+        </FormControl>
+      </Box>
 
       {/* Terms and Conditions Agreement */}
       <Box sx={{ mb: 3 }}>
@@ -182,7 +248,15 @@ export default function PricingPlan({
           Agreement & Consent
         </Typography>
 
-        <Card variant="outlined" sx={{ p: 3 }}>
+        <Box
+          sx={{
+            p: 3,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 2,
+            backgroundColor: "background.default",
+          }}
+        >
           <FormGroup>
             <FormControlLabel
               control={
@@ -193,7 +267,7 @@ export default function PricingPlan({
               label={
                 <Typography variant="body1">
                   I have read, understood, and agree to the Terms & Conditions
-                  and Privacy Policy
+                  and Privacy Policy *
                 </Typography>
               }
             />
@@ -223,18 +297,18 @@ export default function PricingPlan({
               </FormHelperText>
             )}
           </FormGroup>
-        </Card>
+        </Box>
       </Box>
 
       {/* Policy Update Notice */}
       <Alert severity="warning" sx={{ mb: 3 }}>
         <Typography variant="body2" fontWeight="bold" gutterBottom>
-          Important Update
+          Important Update: Financial Statements
         </Typography>
         <Typography variant="body2">
-          Financial Statements are about to charge.
+          Starting soon, Financial Statements will have the following charges:
         </Typography>
-        <Box component="ul" sx={{ pl: 2, mt: 1 }}>
+        <Box component="ul" sx={{ pl: 2, mt: 1, mb: 0 }}>
           <Typography component="li" variant="body2">
             150€ + VAT – for beginners (new entrepreneurs)
           </Typography>
@@ -253,9 +327,15 @@ export default function PricingPlan({
           {...control.register("digital_sign")}
           label="Digital Signature"
           fullWidth
+          required
+          variant="filled"
           placeholder="Type your full name as digital signature"
           helperText="By typing your name, you digitally sign this application"
+          error={!!errors.digital_sign}
         />
+        {errors.digital_sign && (
+          <FormHelperText error>{errors.digital_sign.message}</FormHelperText>
+        )}
       </Box>
     </Box>
   );

@@ -9,7 +9,6 @@ import {
   Button,
   Grid,
   Card,
-  CardContent,
   Fab,
   Zoom,
   useScrollTrigger,
@@ -30,7 +29,6 @@ import {
   CheckCircle,
   ArrowForward,
   Star,
-  Groups,
   Receipt,
   AccountBalance,
   Business,
@@ -716,8 +714,8 @@ export default function HomePage() {
             Ready to Start Your Business Journey?
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-            Join 450+ entrepreneurs who trust Bangland with their business
-            success
+            Join 450+ entrepreneurs who trust Bangland Accounting with their
+            business success
           </Typography>
           <Button
             variant="contained"
@@ -742,33 +740,47 @@ export default function HomePage() {
       {/* Footer */}
       <Box sx={{ bgcolor: "primary.main", color: "white", py: 6 }}>
         <Container maxWidth="lg">
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={6}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: "1fr 1fr",
+              },
+              gap: 4,
+              alignItems: "start",
+            }}
+          >
+            {/* Company Info */}
+            <Box>
               <Typography
                 variant="h5"
                 gutterBottom
                 sx={{ display: "flex", alignItems: "center", gap: 1 }}
               >
                 <Business />
-                Bangland
+                Bangland Accounting
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.8, mb: 2 }}>
                 Your trusted partner for business setup and accounting services
                 in Finland
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                📞 +358449304321 | 📧 finnmaa.sajal@gmail.com
+                📞 +358449304321 | 📧 bangland.ac@gmail.com
               </Typography>
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+
+            {/* Social Links */}
+            <Box>
               <Typography variant="h6" gutterBottom>
                 Connect With Us
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+              <Typography variant="body2" sx={{ opacity: 0.8, mb: 2 }}>
                 Follow us on social media for updates and business tips
               </Typography>
-            </Grid>
-          </Grid>
+              {/* You can add social media icons here later */}
+            </Box>
+          </Box>
         </Container>
       </Box>
       {/* Modals */}

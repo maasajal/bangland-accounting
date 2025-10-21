@@ -18,6 +18,7 @@ export interface IClientForm extends Document {
     about_client: string;
   };
   business: {
+    business_type?: "yes" | "no";
     business_id: string;
     vat_id: string;
     company: string;
@@ -35,6 +36,7 @@ export interface IClientForm extends Document {
   };
   pricing_plan: string;
   work_contracts: string[];
+  other_work_contract?: string;
   agree_with: {
     new_usinesses: string;
     pricing_plan_selection: string;

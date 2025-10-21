@@ -1,45 +1,48 @@
 {
   "pricingPlans": [
     {
-      "value": "light_startup_yearly",
+      "value": "light_startup_yearly_30/kk+25,5%ALV",
       "name": "Most wanted Light & Startup Entrepreneur",
       "label": "Most wanted Light & Startup Entrepreneur",
-      "price": "€29.90",
+      "price": "€30",
       "period": "/month + 25.5% ALV",
       "description": "Yearly subscription (Best value)",
       "popular": true,
       "features": [
         "Monthly Accounting & VAT Returns",
-        "Salary Calculations & Payments",
+        "Invoice Calculations & Payments",
         "Tax Support & Planning",
         "Email & Chat Support",
         "Business Registration Assistance",
-        "Annual Financial Statement (€150 + VAT)"
+        "Income Statement (free)",
+        "Annual Financial Statement (€150 + VAT)",
+        "6-month Minimum Term"
       ],
       "color": "primary",
-      "note": "Billed annually at €358.80"
+      "note": "Billed annually at €360"
     },
     {
-      "value": "light_startup_monthly",
+      "value": "light_startup_monthly_39/kk+25,5%ALV",
       "name": "Light & Startup Entrepreneur",
       "label": "Light & Startup Entrepreneur",
-      "price": "€35.90",
+      "price": "€39",
       "period": "/month + 25.5% ALV",
-      "description": "Monthly subscription",
+      "description": "Monthly subscription (Cancel anytime)",
       "popular": false,
       "features": [
-        "Monthly Accounting & VAT",
-        "Salary Calculations",
-        "Tax Support",
-        "Digital Dashboard",
+        "Monthly Accounting & VAT Returns",
+        "Invoice Calculations",
+        "Tax Support & Planning",
         "Email & Chat Support",
-        "Business Registration Help"
+        "Business Registration Assistance",
+        "Income Statement (free)",
+        "Annual Financial Statement (€150 + VAT)"
       ],
       "color": "primary",
       "note": "Flexible monthly billing"
     },
     {
-      "value": "pro_light",
+      "value": "pro_light_0.99%+25,5%ALV",
       "name": "Pro Light Entrepreneur",
       "label": "Pro Light Entrepreneur",
       "price": "0.99%",
@@ -52,10 +55,90 @@
         "Monthly Accounting",
         "VAT Returns",
         "Tax Support",
+        "Income Statement (free)",
         "Delivery Platform Expertise"
       ],
       "color": "secondary",
       "note": "Ideal for Wolt/Foodora couriers"
+    },
+    {
+      "value": "light_basic_3.99%/+25,5%ALV",
+      "name": "Light Entrepreneur Basic",
+      "label": "Light Entrepreneur Basic",
+      "price": "3.99%",
+      "period": "of gross salary",
+      "description": "Food delivery Substitute only",
+      "popular": false,
+      "features": [
+        "Cost-effective Percentage Model",
+        "Basic Accounting Services",
+        "VAT Handling",
+        "Invoice Calculations",
+        "Income Statement (free)",
+        "Essential Tax Support"
+      ],
+      "color": "secondary",
+      "note": "Ideal for Wolt/Foodora couriers"
+    },
+    {
+      "value": "taxi_driver_49/kk+25,5%ALV",
+      "name": "For Taxi Drivers",
+      "label": "For Taxi driver",
+      "price": "€49",
+      "period": "/month + 25.5% ALV",
+      "description": "Fixed monthly price",
+      "popular": false,
+      "features": [
+        "Taxi-specific Accounting",
+        "VAT Handling",
+        "Income Tracking",
+        "Expense Management",
+        "Tax Support",
+        "Income Statement (free)",
+        "Digital Receipts"
+      ],
+      "color": "primary",
+      "note": "Specialized for taxi professionals"
+    },
+    {
+      "value": "llc_under_100k_49-99/kk+25,5%ALV",
+      "name": "Limited Company (Up to €100K)",
+      "label": "Limited Liability Company (Up to €100K Turnover)",
+      "price": "€49-99",
+      "period": "/month + 25.5% ALV",
+      "description": "Depending on company status and sales turnover",
+      "popular": false,
+      "features": [
+        "Full Accounting Services",
+        "Financial Statements (€150 + VAT)",
+        "Board Meeting Minutes",
+        "Corporate Tax Filing",
+        "VAT Returns",
+        "Payroll Management",
+        "Annual Report Preparation"
+      ],
+      "color": "secondary",
+      "note": "Price scales with turnover"
+    },
+    {
+      "value": "llc_over_100k_99-199/kk+25,5%ALV",
+      "name": "Limited Company (Over €100K)",
+      "label": "Limited Liability Company (Over €100K Turnover)",
+      "price": "€99-199",
+      "period": "/month + 25.5% ALV",
+      "description": "Depending on company status and sales turnover",
+      "popular": false,
+      "features": [
+        "Comprehensive Accounting",
+        "Advanced Financial Reporting",
+        "Strategic Tax Planning",
+        "Dedicated Account Manager",
+        "Priority Support",
+        "Business Advisory Services",
+        "Annual General Meeting Support"
+      ],
+      "color": "secondary",
+      "note": "Premium service for growing companies"
     }
   ]
 }

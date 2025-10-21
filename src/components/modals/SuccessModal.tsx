@@ -20,11 +20,11 @@ interface SuccessModalProps {
 
 export default function SuccessModal({ open, onClose }: SuccessModalProps) {
   const nextSteps = [
-    "We will review your application within 24 hours",
-    "You will receive a welcome email with next steps",
-    "Our team will contact you to schedule an onboarding call",
-    "Prepare your identification documents for verification",
-    "Have your business documents ready (if applicable)",
+    "We will review your application within few minutes",
+    "You will receive a guide line with next steps",
+    "Prepare your strong identification for verification",
+    "You must have to be online bankig to approve mandate request from suomi.fi",
+    "Create a Google drive folder and share with me",
   ];
 
   return (
@@ -52,12 +52,12 @@ export default function SuccessModal({ open, onClose }: SuccessModalProps) {
         </Typography>
 
         <Typography variant="body1" paragraph>
-          Thank you for choosing Bangland as your accounting partner in Finland.
-          Your application has been successfully submitted and is now being
-          processed.
+          Thank you for choosing Bangland Acccounting Services as your
+          accounting partner in Finland. Your application has been successfully
+          submitted and is now being processed.
         </Typography>
 
-        <Alert severity="info" sx={{ mb: 3, textAlign: "left" }}>
+        {/* <Alert severity="info" sx={{ mb: 3, textAlign: "left" }}>
           <Typography variant="body2" fontWeight="bold">
             <Email sx={{ mr: 1, verticalAlign: "middle" }} />
             Check Your Email
@@ -66,7 +66,7 @@ export default function SuccessModal({ open, onClose }: SuccessModalProps) {
             We have sent a confirmation email with your application details and
             next steps.
           </Typography>
-        </Alert>
+        </Alert> */}
 
         <Box sx={{ textAlign: "left", mb: 3 }}>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
@@ -91,7 +91,7 @@ export default function SuccessModal({ open, onClose }: SuccessModalProps) {
           <Typography variant="body2" sx={{ fontStyle: "italic" }}>
             Need immediate assistance?
             <br />
-            Contact us: +358449869280 (WhatsApp/Calls) or be.quickac@gmail.com
+            Contact us: +358449304321 (WhatsApp/Calls) or bangland.ac@gmail.com
           </Typography>
         </Box>
       </DialogContent>
