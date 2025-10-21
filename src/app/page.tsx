@@ -38,6 +38,9 @@ import {
 import ClientForm from "@/components/forms/ClientForm";
 import TermsModal from "@/components/modals/TermsModal";
 import SuccessModal from "@/components/modals/SuccessModal";
+import { AnimatedCounter } from "@/components/AnimatedCounter";
+import { PricingPlan } from "@/types/pricing";
+import pricingData from "@/data/pricingPlans.json";
 
 // Scroll to top component
 function ScrollTop() {
@@ -70,6 +73,7 @@ export default function HomePage() {
   const [showForm, setShowForm] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
+  const pricingPlans: PricingPlan[] = pricingData.pricingPlans;
 
   const features = [
     {
@@ -110,9 +114,9 @@ export default function HomePage() {
       icon: <AccountBalance />,
       items: [
         "Monthly Bookkeeping",
+        "Unlimited Invoicing",
         "VAT Returns",
         "Financial Statements",
-        "Payroll Management",
       ],
     },
     {
@@ -150,42 +154,11 @@ export default function HomePage() {
     },
   ];
 
-  const pricingPlans = [
-    {
-      name: "Light Entrepreneur",
-      price: "€39-49",
-      period: "/month",
-      popular: true,
-      features: [
-        "Monthly Accounting & VAT",
-        "Salary Calculations",
-        "Tax Support",
-        "Digital Dashboard",
-        "Email & Chat Support",
-      ],
-      color: "primary",
-    },
-    {
-      name: "Limited Company",
-      price: "€99-199",
-      period: "/month",
-      popular: false,
-      features: [
-        "Full Accounting Services",
-        "Financial Statements",
-        "Board Meeting Minutes",
-        "Corporate Tax Filing",
-        "Dedicated Account Manager",
-      ],
-      color: "secondary",
-    },
-  ];
-
   const stats = [
-    { number: "500+", label: "Happy Clients" },
+    { number: "450+", label: "Happy Clients" },
     { number: "24h", label: "Average Response Time" },
     { number: "99%", label: "Satisfaction Rate" },
-    { number: "5+", label: "Years Experience" },
+    { number: "3+", label: "Years Experience" },
   ];
 
   const handleGetStarted = () => {
@@ -216,7 +189,7 @@ export default function HomePage() {
           <Grid container spacing={6} alignItems="center">
             <Grid item xs={12} md={6}>
               <Chip
-                label="🚀 Trusted by 500+ Entrepreneurs"
+                label="🚀 Trusted by 450+ Entrepreneurs"
                 sx={{
                   bgcolor: alpha("#ffffff", 0.2),
                   color: "white",
@@ -296,26 +269,20 @@ export default function HomePage() {
                   sx={{ display: "flex", alignItems: "center", gap: 1 }}
                 >
                   <Star sx={{ color: "#fbbf24" }} />
-                  Why Choose QuickAccount?
+                  Why Choose Us?
                 </Typography>
                 <List>
                   <ListItem>
                     <ListItemIcon sx={{ minWidth: 40, color: "#fbbf24" }}>
                       <CheckCircle />
                     </ListItemIcon>
-                    <ListItemText primary="Finnish & English speaking experts" />
+                    <ListItemText primary="English & Bangla speaking experts, Basic Hindi" />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon sx={{ minWidth: 40, color: "#fbbf24" }}>
                       <CheckCircle />
                     </ListItemIcon>
                     <ListItemText primary="Fixed monthly pricing - no surprises" />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemIcon sx={{ minWidth: 40, color: "#fbbf24" }}>
-                      <CheckCircle />
-                    </ListItemIcon>
-                    <ListItemText primary="Digital dashboard for real-time updates" />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon sx={{ minWidth: 40, color: "#fbbf24" }}>
@@ -329,7 +296,6 @@ export default function HomePage() {
           </Grid>
         </Container>
       </Box>
-
       {/* Features Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Box sx={{ textAlign: "center", mb: 6 }}>
@@ -346,34 +312,56 @@ export default function HomePage() {
           </Typography>
         </Box>
 
-        <Grid container spacing={4}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(4, 1fr)",
+            },
+            gap: 3,
+            width: "100%",
+          }}
+        >
           {features.map((feature, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Card sx={{ textAlign: "center", p: 3, height: "100%" }}>
+            <Box key={index} sx={{ width: "100%" }}>
+              <Card
+                sx={{
+                  textAlign: "center",
+                  p: 3,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
                 <Avatar
                   sx={{
                     bgcolor: alpha("#7c3aed", 0.1),
                     color: "primary.main",
                     width: 60,
                     height: 60,
-                    mx: "auto",
                     mb: 2,
                   }}
                 >
                   {feature.icon}
                 </Avatar>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom sx={{ width: "100%" }}>
                   {feature.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ flexGrow: 1 }}
+                >
                   {feature.description}
                 </Typography>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
-
       {/* Services Section */}
       <Box id="services" sx={{ bgcolor: "background.paper", py: 8 }}>
         <Container maxWidth="lg">
@@ -382,47 +370,64 @@ export default function HomePage() {
               Comprehensive Business Services
             </Typography>
             <Typography variant="h6" color="text.secondary">
-              From startup to scale-up, we've got you covered
+              From startup to scale-up, we have got you covered
             </Typography>
           </Box>
 
-          <Grid container spacing={4}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "minmax(300px, 1fr)",
+                md: "repeat(3, minmax(300px, 1fr))",
+              },
+              gap: 3,
+              justifyItems: "center",
+            }}
+          >
             {services.map((service, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <Card sx={{ p: 4, height: "100%" }}>
-                  <Avatar
-                    sx={{
-                      bgcolor: alpha("#f59e0b", 0.1),
-                      color: "secondary.main",
-                      width: 60,
-                      height: 60,
-                      mb: 3,
-                    }}
-                  >
-                    {service.icon}
-                  </Avatar>
-                  <Typography variant="h5" gutterBottom>
-                    {service.category}
-                  </Typography>
-                  <List dense>
-                    {service.items.map((item, itemIndex) => (
-                      <ListItem key={itemIndex} sx={{ px: 0 }}>
-                        <ListItemIcon
-                          sx={{ minWidth: 32, color: "secondary.main" }}
-                        >
-                          <CheckCircle fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText primary={item} />
-                      </ListItem>
-                    ))}
-                  </List>
-                </Card>
-              </Grid>
+              <Card
+                key={index}
+                sx={{
+                  p: 4,
+                  height: "100%",
+                  width: "100%",
+                  maxWidth: 380,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: alpha("#f59e0b", 0.1),
+                    color: "secondary.main",
+                    width: 60,
+                    height: 60,
+                    mb: 3,
+                  }}
+                >
+                  {service.icon}
+                </Avatar>
+                <Typography variant="h5" gutterBottom>
+                  {service.category}
+                </Typography>
+                <List dense sx={{ flexGrow: 1 }}>
+                  {service.items.map((item, itemIndex) => (
+                    <ListItem key={itemIndex} sx={{ px: 0 }}>
+                      <ListItemIcon
+                        sx={{ minWidth: 32, color: "secondary.main" }}
+                      >
+                        <CheckCircle fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText primary={item} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Card>
             ))}
-          </Grid>
+          </Box>
         </Container>
       </Box>
-
       {/* Process Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Box sx={{ textAlign: "center", mb: 6 }}>
@@ -434,54 +439,75 @@ export default function HomePage() {
           </Typography>
         </Box>
 
-        <Grid container spacing={4}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "minmax(250px, 1fr)",
+              sm: "repeat(2, minmax(250px, 1fr))",
+              md: "repeat(4, minmax(250px, 1fr))",
+            },
+            gap: 4,
+            justifyItems: "center",
+          }}
+        >
           {processSteps.map((step, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Box sx={{ textAlign: "center", position: "relative" }}>
-                <Avatar
-                  sx={{
-                    bgcolor: "primary.main",
-                    color: "white",
-                    width: 60,
-                    height: 60,
-                    mx: "auto",
-                    mb: 2,
-                    fontSize: "1.5rem",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {step.step}
-                </Avatar>
-                <Typography variant="h6" gutterBottom>
-                  {step.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {step.description}
-                </Typography>
-              </Box>
-            </Grid>
+            <Box
+              key={index}
+              sx={{
+                textAlign: "center",
+                position: "relative",
+                width: "100%",
+                maxWidth: 280,
+              }}
+            >
+              <Avatar
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "white",
+                  width: 60,
+                  height: 60,
+                  mx: "auto",
+                  mb: 2,
+                  fontSize: "1.5rem",
+                  fontWeight: "bold",
+                }}
+              >
+                {step.step}
+              </Avatar>
+              <Typography variant="h6" gutterBottom>
+                {step.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {step.description}
+              </Typography>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
-
       {/* Stats Section */}
-      <Box sx={{ bgcolor: "primary.main", color: "white", py: 6 }}>
+      <Box sx={{ bgcolor: "primary.main", color: "white", py: 8 }}>
         <Container maxWidth="lg">
-          <Grid container spacing={4}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "repeat(2, 1fr)",
+                md: "repeat(4, 1fr)",
+              },
+              gap: 4,
+            }}
+          >
             {stats.map((stat, index) => (
-              <Grid item xs={6} md={3} key={index} sx={{ textAlign: "center" }}>
-                <Typography variant="h3" fontWeight="bold" gutterBottom>
-                  {stat.number}
-                </Typography>
-                <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                  {stat.label}
-                </Typography>
-              </Grid>
+              <AnimatedCounter
+                key={index}
+                value={stat.number}
+                label={stat.label}
+              />
             ))}
-          </Grid>
+          </Box>
         </Container>
       </Box>
-
       {/* Pricing Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Box sx={{ textAlign: "center", mb: 6 }}>
@@ -491,9 +517,131 @@ export default function HomePage() {
           <Typography variant="h6" color="text.secondary">
             No hidden fees, no surprises
           </Typography>
+          <Typography variant="h6" color="text.secondary">
+            VAT is deductible
+          </Typography>
         </Box>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              md: "repeat(2, 1fr)",
+              lg: "repeat(3, 1fr)",
+            },
+            gap: 3,
+            justifyItems: "center",
+          }}
+        >
+          {pricingPlans.map((plan, index) => (
+            <Card
+              key={index}
+              sx={{
+                p: 4,
+                width: "100%",
+                maxWidth: 380,
+                border: plan.popular ? "2px solid" : "1px solid",
+                borderColor: plan.popular ? "primary.main" : "divider",
+                position: "relative",
+                transform: plan.popular ? "scale(1.02)" : "scale(1)",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: plan.popular ? "scale(1.05)" : "scale(1.02)",
+                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1)",
+                },
+              }}
+            >
+              {plan.popular && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: -5,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    bgcolor: "primary.main",
+                    color: "white",
+                    px: 3,
+                    py: 0.5,
+                    borderRadius: 2,
+                    fontSize: "0.875rem",
+                    fontWeight: "bold",
+                  }}
+                >
+                  🏆 MOST POPULAR
+                </Box>
+              )}
 
-        <Grid container spacing={4} justifyContent="center">
+              <Typography
+                variant="h5"
+                gutterBottom
+                align="center"
+                fontWeight="bold"
+                mt={5}
+              >
+                {plan.name}
+              </Typography>
+
+              <Box sx={{ textAlign: "center", mb: 2 }}>
+                <Typography variant="h3" color="primary.main" fontWeight="bold">
+                  {plan.price}
+                </Typography>
+                <Typography variant="h6" color="text.secondary">
+                  {plan.period}
+                </Typography>
+                {plan.note && (
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontStyle: "italic" }}
+                  >
+                    {plan.note}
+                  </Typography>
+                )}
+              </Box>
+
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                align="center"
+                sx={{ mb: 3 }}
+              >
+                {plan.description}
+              </Typography>
+
+              <List dense sx={{ mb: 3 }}>
+                {plan.features.map((feature, featureIndex) => (
+                  <ListItem key={featureIndex} sx={{ px: 0 }}>
+                    <ListItemIcon sx={{ minWidth: 32, color: "primary.main" }}>
+                      <CheckCircle fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={feature}
+                      primaryTypographyProps={{ variant: "body2" }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+
+              <Button
+                variant={plan.popular ? "contained" : "outlined"}
+                fullWidth
+                size="large"
+                onClick={handleGetStarted}
+                sx={{
+                  mt: "auto",
+                  bgcolor: plan.popular ? "primary.main" : "transparent",
+                  "&:hover": {
+                    bgcolor: plan.popular ? "primary.dark" : "primary.main",
+                    color: "white",
+                  },
+                }}
+              >
+                Select Plan
+              </Button>
+            </Card>
+          ))}
+        </Box>
+        {/* <Grid container spacing={4} justifyContent="center">
           {pricingPlans.map((plan, index) => (
             <Grid item xs={12} md={6} key={index}>
               <Card
@@ -559,9 +707,8 @@ export default function HomePage() {
               </Card>
             </Grid>
           ))}
-        </Grid>
+        </Grid> */}
       </Container>
-
       {/* CTA Section */}
       <Box sx={{ bgcolor: "background.paper", py: 8 }}>
         <Container maxWidth="md" sx={{ textAlign: "center" }}>
@@ -569,7 +716,7 @@ export default function HomePage() {
             Ready to Start Your Business Journey?
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-            Join 500+ entrepreneurs who trust QuickAccount with their business
+            Join 450+ entrepreneurs who trust Bangland with their business
             success
           </Typography>
           <Button
@@ -584,7 +731,6 @@ export default function HomePage() {
           </Button>
         </Container>
       </Box>
-
       {/* Enrollment Form Section */}
       {showForm && (
         <Box id="enrollment-form" sx={{ py: 8, bgcolor: "background.default" }}>
@@ -593,7 +739,6 @@ export default function HomePage() {
           </Container>
         </Box>
       )}
-
       {/* Footer */}
       <Box sx={{ bgcolor: "primary.main", color: "white", py: 6 }}>
         <Container maxWidth="lg">
@@ -605,14 +750,14 @@ export default function HomePage() {
                 sx={{ display: "flex", alignItems: "center", gap: 1 }}
               >
                 <Business />
-                QuickAccount
+                Bangland
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.8, mb: 2 }}>
                 Your trusted partner for business setup and accounting services
                 in Finland
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                📞 +358449869280 | 📧 be.quickac@gmail.com
+                📞 +358449304321 | 📧 finnmaa.sajal@gmail.com
               </Typography>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -626,11 +771,9 @@ export default function HomePage() {
           </Grid>
         </Container>
       </Box>
-
       {/* Modals */}
       <TermsModal open={termsOpen} onClose={() => setTermsOpen(false)} />
       <SuccessModal open={successOpen} onClose={() => setSuccessOpen(false)} />
-
       <ScrollTop />
     </Box>
   );

@@ -1,0 +1,61 @@
+{
+  "pricingPlans": [
+    {
+      "value": "light_startup_yearly",
+      "name": "Most wanted Light & Startup Entrepreneur",
+      "label": "Most wanted Light & Startup Entrepreneur",
+      "price": "€29.90",
+      "period": "/month + 25.5% ALV",
+      "description": "Yearly subscription (Best value)",
+      "popular": true,
+      "features": [
+        "Monthly Accounting & VAT Returns",
+        "Salary Calculations & Payments",
+        "Tax Support & Planning",
+        "Email & Chat Support",
+        "Business Registration Assistance",
+        "Annual Financial Statement (€150 + VAT)"
+      ],
+      "color": "primary",
+      "note": "Billed annually at €358.80"
+    },
+    {
+      "value": "light_startup_monthly",
+      "name": "Light & Startup Entrepreneur",
+      "label": "Light & Startup Entrepreneur",
+      "price": "€35.90",
+      "period": "/month + 25.5% ALV",
+      "description": "Monthly subscription",
+      "popular": false,
+      "features": [
+        "Monthly Accounting & VAT",
+        "Salary Calculations",
+        "Tax Support",
+        "Digital Dashboard",
+        "Email & Chat Support",
+        "Business Registration Help"
+      ],
+      "color": "primary",
+      "note": "Flexible monthly billing"
+    },
+    {
+      "value": "pro_light",
+      "name": "Pro Light Entrepreneur",
+      "label": "Pro Light Entrepreneur",
+      "price": "0.99%",
+      "period": "of gross salary + 25.5% ALV",
+      "description": "Food delivery ID owner only",
+      "popular": false,
+      "features": [
+        "Percentage-based Pricing",
+        "Invoice Processing",
+        "Monthly Accounting",
+        "VAT Returns",
+        "Tax Support",
+        "Delivery Platform Expertise"
+      ],
+      "color": "secondary",
+      "note": "Ideal for Wolt/Foodora couriers"
+    }
+  ]
+}

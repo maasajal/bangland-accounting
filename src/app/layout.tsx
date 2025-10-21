@@ -9,7 +9,7 @@ import theme from "@/theme/theme";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Bangland - Business Setup & Accounting Services",
+  title: "Bangland - Accounting Services",
   description:
     "Best Accounting services for Wolt & Foodora riders. Invoice, Bookkeeping, VAT submission & TAX calculations, Invoicing to Delivery company Wolt & Foodora. Join Bangland for professional business setup and accounting services in Finland",
 };
