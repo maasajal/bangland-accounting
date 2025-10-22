@@ -1,7 +1,12 @@
 // src/components/forms/form-sections/BusinessInfo.tsx
 "use client";
 
-import { Control, FieldErrors } from "react-hook-form";
+import {
+  Control,
+  FieldErrors,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 import { useState } from "react";
 import {
   Box,
@@ -12,14 +17,18 @@ import {
   Select,
   MenuItem,
   RadioGroup,
+  FormGroup,
+  Checkbox,
   FormControlLabel,
   Radio,
   FormLabel,
+  FormHelperText,
   IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  Divider,
   Button,
   List,
   ListItem,
@@ -32,21 +41,35 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Help, CheckCircle } from "@mui/icons-material";
 import { IClientForm } from "@/types/client";
 
+const workContracts = [
+  "I have own Wolt/Foodora ID",
+  "I am a substitute of Wolt/Foodora",
+  "My Wolt/Foodora ID is temporary",
+  "I am looking for a food delivery ID",
+  "I have a Taxi business",
+  "I am a Taxi driver",
+  "Other",
+];
+
 interface BusinessInfoProps {
   control: Control<IClientForm>;
   errors: FieldErrors<IClientForm>;
-  setValue: unknown; // To set the VAT ID value programmatically
+  setValue?: UseFormSetValue<IClientForm>;
+  watch?: UseFormWatch<IClientForm>;
 }
 
 export default function BusinessInfo({
   control,
   errors,
   setValue,
+  watch,
 }: BusinessInfoProps) {
   const [vatInfoOpen, setVatInfoOpen] = useState(false);
   const [hasBusinessId, setHasBusinessId] = useState<"yes" | "no">("no");
   const [businessIdValue, setBusinessIdValue] = useState("");
-  const [displayVatId, setDisplayVatId] = useState("");
+  const [vatIdValue, setVatIdValue] = useState("");
+  const selectedWorkContracts = watch ? watch("work_contracts") || [] : [];
+  const showOtherInput = selectedWorkContracts.includes("Other");
 
   const handleOpenVatInfo = () => setVatInfoOpen(true);
   const handleCloseVatInfo = () => setVatInfoOpen(false);
@@ -54,34 +77,73 @@ export default function BusinessInfo({
   const handleBusinessTypeChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setHasBusinessId(event.target.value as "yes" | "no");
+    const value = event.target.value as "yes" | "no";
+    setHasBusinessId(value);
+    if (setValue) {
+      setValue("business.business_type", value);
+    }
   };
 
   // Function to generate VAT ID from Business ID
-  const generateVatId = (businessId: string) => {
+  const generateVatId = (businessId: string): string => {
     if (!businessId) return "";
 
-    // Remove all non-digit characters (dashes, spaces, etc.)
     const cleanBusinessId = businessId.replace(/\D/g, "");
-
     if (cleanBusinessId.length < 7) return "";
 
-    // Format as FI + 8 digits (Finnish VAT ID format)
-    return `FI${cleanBusinessId}`;
+    const baseNumber = cleanBusinessId.slice(0, 7);
+    const checksum =
+      cleanBusinessId.length >= 8 ? cleanBusinessId.slice(7, 8) : "0";
+    return `FI${baseNumber}${checksum}`;
   };
 
-  // Handle Business ID input change
+  // Handle Business ID input with formatting and VAT ID generation
   const handleBusinessIdChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value;
-    setBusinessIdValue(value);
+    let value = event.target.value;
+    const digitsOnly = value.replace(/\D/g, "");
 
-    // Auto-generate VAT ID
+    // Format as 1234567-8 when we have enough digits
+    if (digitsOnly.length >= 7) {
+      value = `${digitsOnly.slice(0, 7)}-${digitsOnly.slice(7, 8)}`;
+    } else {
+      value = digitsOnly;
+    }
+
+    setBusinessIdValue(value);
     const vatId = generateVatId(value);
-    if (vatId) {
+    setVatIdValue(vatId);
+
+    if (setValue) {
+      setValue("business.business_id", value);
       setValue("business.vat_id", vatId);
     }
+  };
+
+  // Handle Business ID blur for final formatting
+  const handleBusinessIdBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    const digitsOnly = value.replace(/\D/g, "");
+
+    if (digitsOnly.length >= 7) {
+      const formattedValue = `${digitsOnly.slice(0, 7)}-${digitsOnly.slice(
+        7,
+        8
+      )}`;
+      setBusinessIdValue(formattedValue);
+      const vatId = generateVatId(formattedValue);
+      setVatIdValue(vatId);
+
+      if (setValue) {
+        setValue("business.business_id", formattedValue);
+        setValue("business.vat_id", vatId);
+      }
+    }
+  };
+
+  const handleCheckboxClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
   };
 
   const vatGuides = [
@@ -173,88 +235,61 @@ export default function BusinessInfo({
             {/* Business ID */}
             <Box>
               <TextField
-                {...control.register("business.business_id")}
                 label="Business ID"
                 fullWidth
                 required
                 variant="filled"
+                value={businessIdValue}
+                onChange={handleBusinessIdChange}
+                onBlur={handleBusinessIdBlur}
                 error={!!errors.business?.business_id}
-                helperText={errors.business?.business_id?.message}
+                helperText={
+                  errors.business?.business_id?.message ||
+                  "Format: 1234567-8 (7 digits + dash + 1 digit)"
+                }
                 placeholder="1234567-8"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  const value = event.target.value;
-                  setBusinessIdValue(value);
-
-                  // Auto-generate VAT ID in real-time
-                  const cleanBusinessId = value.replace(/\D/g, "");
-                  if (cleanBusinessId.length >= 7) {
-                    const vatId = `FI${cleanBusinessId}`;
-                    setValue("business.vat_id", vatId);
-                    setDisplayVatId(vatId);
-                  } else {
-                    // Clear VAT ID if Business ID is too short
-                    setValue("business.vat_id", "");
-                    setDisplayVatId("");
-                  }
-                }}
-                onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
-                  const value = event.target.value;
-                  // Format Business ID with dash when user leaves the field
-                  const cleanBusinessId = value.replace(/\D/g, "");
-                  if (cleanBusinessId.length >= 7) {
-                    const formattedBusinessId = `${cleanBusinessId.slice(
-                      0,
-                      7
-                    )}-${cleanBusinessId.slice(7, 8)}`;
-                    setValue("business.business_id", formattedBusinessId);
-                    setBusinessIdValue(formattedBusinessId);
-
-                    // Ensure VAT ID is set with the final formatted value
-                    const vatId = `FI${cleanBusinessId}`;
-                    setValue("business.vat_id", vatId);
-                    setDisplayVatId(vatId);
-                  }
-                }}
                 inputProps={{
                   maxLength: 9,
-                  pattern: "[0-9]{7}-[0-9]{1}",
-                  title: "Format: 1234567-8",
                 }}
+              />
+              <input
+                type="hidden"
+                {...control.register("business.business_id")}
+                value={businessIdValue}
               />
             </Box>
 
-            {/* Auto-generated VAT ID - Display only */}
+            {/* Auto-generated VAT ID */}
             <Box>
               <TextField
-                {...control.register("business.vat_id")}
                 label="VAT ID (Auto-generated)"
                 fullWidth
                 variant="filled"
-                value={displayVatId}
+                value={vatIdValue}
                 InputProps={{
                   readOnly: true,
                 }}
                 placeholder="FI12345678"
                 helperText={
-                  displayVatId
+                  businessIdValue
                     ? "Automatically generated from your Business ID"
                     : "Enter Business ID to generate VAT ID"
                 }
                 sx={{
                   "& .MuiInputBase-input": {
-                    backgroundColor: "grey.100",
-                    color: "text.secondary",
+                    backgroundColor: "action.hover",
+                    cursor: "not-allowed",
                   },
                 }}
               />
               <input
                 type="hidden"
                 {...control.register("business.vat_id")}
-                value={displayVatId}
+                value={vatIdValue}
               />
             </Box>
 
-            {/* Company Name - Full width */}
+            {/* Company Name */}
             <Box>
               <TextField
                 {...control.register("business.company")}
@@ -267,12 +302,17 @@ export default function BusinessInfo({
                 placeholder="Last Name First Name | Your Company Oy"
               />
             </Box>
+
             {/* Business Start Date */}
             <Box>
               <FormControl fullWidth>
                 <DatePicker
                   label="Business Start Date"
-                  {...control.register("business.business_start_date")}
+                  onChange={(date: Date | null) => {
+                    if (date && setValue) {
+                      setValue("business.business_start_date", date);
+                    }
+                  }}
                   slotProps={{
                     textField: {
                       fullWidth: true,
@@ -282,6 +322,10 @@ export default function BusinessInfo({
                       helperText: errors.business?.business_start_date?.message,
                     },
                   }}
+                />
+                <input
+                  type="hidden"
+                  {...control.register("business.business_start_date")}
                 />
               </FormControl>
             </Box>
@@ -303,8 +347,8 @@ export default function BusinessInfo({
           </Box>
         )}
 
-        {/* VAT Return Frequency Section - Show for both options */}
-        <Box sx={{ mt: 4 }}>
+        {/* VAT Return Frequency Section */}
+        <Box sx={{ mt: 4, mb: 4 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
             <FormLabel
               component="legend"
@@ -339,16 +383,12 @@ export default function BusinessInfo({
               </MenuItem>
               <MenuItem value="yearly">Yearly</MenuItem>
             </Select>
+            {errors.business?.vat_return_activities && (
+              <FormHelperText error>
+                {errors.business.vat_return_activities.message}
+              </FormHelperText>
+            )}
           </FormControl>
-          {errors.business?.vat_return_activities && (
-            <Typography
-              variant="caption"
-              color="error"
-              sx={{ display: "block", mt: 0.5 }}
-            >
-              {errors.business.vat_return_activities.message}
-            </Typography>
-          )}
         </Box>
 
         {/* Hidden field to store business_type in form data */}
@@ -357,6 +397,72 @@ export default function BusinessInfo({
           {...control.register("business.business_type")}
           value={hasBusinessId}
         />
+
+        <Divider sx={{ my: 4 }} />
+
+        {/* Work Contracts Status */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+            Work Contracts Status
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Select all that apply to your current situation
+          </Typography>
+
+          <FormControl
+            component="fieldset"
+            error={!!errors.work_contracts}
+            fullWidth
+          >
+            <FormGroup>
+              {workContracts.map((contract) => (
+                <FormControlLabel
+                  key={contract}
+                  control={
+                    <Checkbox
+                      {...control.register("work_contracts")}
+                      value={contract}
+                      onClick={handleCheckboxClick}
+                    />
+                  }
+                  label={contract}
+                  sx={{
+                    borderRadius: 1,
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                />
+              ))}
+            </FormGroup>
+            {errors.work_contracts && (
+              <FormHelperText error>
+                {errors.work_contracts.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          {/* Other Work Contract Input */}
+          {showOtherInput && (
+            <Box sx={{ mt: 2 }}>
+              <TextField
+                {...control.register("work_contracts_other")}
+                label="Please specify other work contract"
+                fullWidth
+                required
+                variant="filled"
+                placeholder="Describe your work contract situation..."
+                helperText="Tell us about your specific work contract or employment situation"
+                error={!!errors.work_contracts_other}
+              />
+              {errors.work_contracts_other && (
+                <FormHelperText error>
+                  {errors.work_contracts_other.message}
+                </FormHelperText>
+              )}
+            </Box>
+          )}
+        </Box>
 
         {/* VAT Information Modal */}
         <Dialog

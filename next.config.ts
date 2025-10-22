@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   },
   trailingSlash: false,
   poweredByHeader: false,
+  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;

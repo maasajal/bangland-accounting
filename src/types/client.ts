@@ -38,7 +38,7 @@ export interface IClientForm extends Document {
   work_contracts: string[];
   other_work_contract?: string;
   agree_with: {
-    new_usinesses: string;
+    new_businesses: string;
     pricing_plan_selection: string;
     service_start_date: string;
     comment: string;

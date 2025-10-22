@@ -111,7 +111,7 @@ export default function BankInfo({
             error={!!errors.bank?.bank_name}
             variant="filled"
           >
-            <InputLabel>Select Your Bank *</InputLabel>
+            <InputLabel>Select Your Bank</InputLabel>
             <Select
               {...control.register("bank.bank_name")}
               label="Select Your Bank"
@@ -140,7 +140,7 @@ export default function BankInfo({
           <>
             <Box>
               <TextField
-                label="Bank Name *"
+                label="Bank Name"
                 fullWidth
                 variant="filled"
                 value={customBank}
@@ -157,7 +157,7 @@ export default function BankInfo({
             {/* Custom BIC Input for Other Bank */}
             <Box>
               <TextField
-                label="BIC/SWIFT Code *"
+                label="BIC/SWIFT Code"
                 fullWidth
                 variant="filled"
                 value={customBic}
@@ -180,13 +180,13 @@ export default function BankInfo({
         {/* Bank Account Number - Show for all cases */}
         <Box>
           <TextField
-            {...control.register("bank.bank_account_no")}
-            label="Bank Account Number (IBAN) *"
+            {...control.register("bank.bank_acccount_no")}
+            label="Bank Account Number (IBAN)"
             fullWidth
             variant="filled"
-            error={!!errors.bank?.bank_account_no}
+            error={!!errors.bank?.bank_acccount_no}
             helperText={
-              errors.bank?.bank_account_no?.message ||
+              errors.bank?.bank_acccount_no?.message ||
               "Format: FI12 3456 7890 1234 56"
             }
             placeholder="FI12 3456 7890 1234 56"
@@ -203,7 +203,7 @@ export default function BankInfo({
             <Box>
               <TextField
                 {...control.register("bank.bic")}
-                label="BIC/SWIFT Code *"
+                label="BIC/SWIFT Code"
                 fullWidth
                 variant="filled"
                 value={selectedBic || ""}

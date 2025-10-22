@@ -1,7 +1,13 @@
 // src/components/forms/form-sections/PricingPlan.tsx
 "use client";
 
-import { Control, FieldErrors, UseFormWatch } from "react-hook-form";
+import {
+  Control,
+  FieldErrors,
+  UseFormWatch,
+  UseFormSetValue,
+} from "react-hook-form";
+import { useState, useRef, useEffect } from "react";
 import {
   FormControl,
   FormLabel,
@@ -9,43 +15,107 @@ import {
   Box,
   Alert,
   FormGroup,
+  Radio,
   Checkbox,
   FormHelperText,
   TextField,
   FormControlLabel,
-  Radio,
-  RadioGroup,
+  Button,
 } from "@mui/material";
 import { IClientForm } from "@/types/client";
-import pricingData from "@/data/pricingPlans.json";
+import pricingPlansData from "@/data/pricingPlans.json";
 
 interface PricingPlanProps {
   control: Control<IClientForm>;
   errors: FieldErrors<IClientForm>;
   watch: UseFormWatch<IClientForm>;
+  setValue: UseFormSetValue<IClientForm>;
+  onOpenTerms: () => void;
 }
-
-const workContracts = [
-  "I have own Wolt/Foodora ID",
-  "I am a substitute of Wolt/Foodora",
-  "My Wolt/Foodora ID is temporary",
-  "I am looking for a food delivery ID",
-  "I have a Taxi business",
-  "I am a Taxi driver",
-  "Other",
-];
 
 export default function PricingPlan({
   control,
   errors,
   watch,
+  setValue,
+  onOpenTerms,
 }: PricingPlanProps) {
-  const watchTerms = watch("agree_with.terms_conditions");
-  const selectedWorkContracts = watch("work_contracts") || [];
-  const showOtherInput = selectedWorkContracts.includes("Other");
+  const [selectedPlan, setSelectedPlan] = useState<string>("");
+  const digitalSignatureRef = useRef<HTMLInputElement>(null);
+  const [isInitialRender, setIsInitialRender] = useState(true);
+
+  // Handle plan selection
+  const handlePlanSelect = (planValue: string) => {
+    setSelectedPlan(planValue);
+
+    // Find the selected plan to get the price + period
+    const selectedPlanData = pricingPlansData.pricingPlans.find(
+      (plan) => plan.value === planValue
+    );
+    if (selectedPlanData) {
+      // Store price + period as the pricing plan value
+      const pricingPlanValue = `${selectedPlanData.price}${selectedPlanData.period}`;
+      setValue("pricing_plan", pricingPlanValue);
+    }
+  };
+
+  // Handle checkbox change for terms
+  const handleTermsCheckboxClick = () => {
+    const currentValue = watch("agree_with.terms_conditions.i_agree");
+    setValue("agree_with.terms_conditions.i_agree", !currentValue);
+  };
+
+  // Handle checkbox change for confirmation
+  const handleConfirmCheckboxClick = () => {
+    const currentValue = watch("agree_with.terms_conditions.confirm");
+    setValue("agree_with.terms_conditions.confirm", !currentValue);
+  };
+
+  // Handle terms text click
+  const handleTermsTextClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handleTermsCheckboxClick();
+  };
+
+  // Handle confirm text click
+  const handleConfirmTextClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handleConfirmCheckboxClick();
+  };
+
+  // Handle terms button click
+  const handleTermsButtonClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onOpenTerms();
+  };
+
+  // Prevent auto-focus issues
+  useEffect(() => {
+    if (isInitialRender && digitalSignatureRef.current) {
+      digitalSignatureRef.current.blur();
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      setIsInitialRender(false);
+    }
+  }, [isInitialRender]);
+
+  const handleContainerClick = (event: React.MouseEvent) => {
+    if (
+      (event.target as HTMLElement).tagName !== "INPUT" &&
+      (event.target as HTMLElement).tagName !== "TEXTAREA" &&
+      (event.target as HTMLElement).tagName !== "BUTTON" &&
+      !(event.target as HTMLElement).closest("input, textarea, button")
+    ) {
+      event.preventDefault();
+    }
+  };
 
   return (
-    <Box>
+    <Box onClick={handleContainerClick}>
       <Typography
         variant="h6"
         gutterBottom
@@ -53,61 +123,6 @@ export default function PricingPlan({
       >
         Select Your Pricing Plan & Agreement
       </Typography>
-
-      {/* Work Contracts Status */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-          What is your Work Contracts status right now?
-        </Typography>
-
-        <FormControl
-          component="fieldset"
-          error={!!errors.work_contracts}
-          fullWidth
-        >
-          <FormGroup>
-            {workContracts.map((contract) => (
-              <FormControlLabel
-                key={contract}
-                control={
-                  <Checkbox
-                    {...control.register("work_contracts")}
-                    value={contract}
-                  />
-                }
-                label={contract}
-                sx={{
-                  mb: 1,
-                  p: 1,
-                  borderRadius: 1,
-                  "&:hover": {
-                    backgroundColor: "action.hover",
-                  },
-                }}
-              />
-            ))}
-          </FormGroup>
-          {errors.work_contracts && (
-            <FormHelperText error>
-              {errors.work_contracts.message}
-            </FormHelperText>
-          )}
-        </FormControl>
-
-        {/* Other Work Contract Input */}
-        {showOtherInput && (
-          <Box sx={{ mt: 2 }}>
-            <TextField
-              {...control.register("work_contracts_other")}
-              label="Please specify other work contract"
-              fullWidth
-              variant="filled"
-              placeholder="Describe your work contract situation..."
-              helperText="Tell us about your specific work contract or employment situation"
-            />
-          </Box>
-        )}
-      </Box>
 
       {/* Pricing Plans */}
       <Box sx={{ mb: 4 }}>
@@ -140,99 +155,85 @@ export default function PricingPlan({
             Select Pricing Plan *
           </FormLabel>
 
-          <RadioGroup
-            {...control.register("pricing_plan")}
-            aria-label="pricing-plan"
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "1fr 1fr",
+              },
+              gap: 1.5,
+            }}
           >
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  sm: "1fr 1fr",
-                },
-                gap: 1.5,
-              }}
-            >
-              {pricingData.pricingPlans.map((plan) => (
-                <Box
-                  key={plan.value}
-                  sx={{
-                    p: 2,
-                    border: "1.5px solid",
-                    borderColor: plan.popular ? "primary.main" : "grey.200",
-                    borderRadius: 1.5,
-                    backgroundColor: plan.popular
-                      ? "primary.50"
-                      : "transparent",
-                    transition: "all 0.15s ease",
-                    "&:hover": {
-                      borderColor: "primary.main",
-                      backgroundColor: plan.popular ? "primary.100" : "grey.50",
-                    },
-                  }}
-                >
-                  <FormControlLabel
-                    value={plan.value}
-                    control={<Radio size="small" />}
-                    label={
-                      <Box
-                        sx={{
-                          ml: 1,
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          minHeight: "100%",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center", // Changed from flex-start to center
-                            gap: 1,
-                          }}
+            {pricingPlansData.pricingPlans.map((plan) => (
+              <Box
+                key={plan.value}
+                sx={{
+                  p: 2,
+                  border: "2px solid",
+                  borderColor:
+                    selectedPlan === plan.value ? "primary.main" : "grey.300",
+                  borderRadius: 1.5,
+                  backgroundColor:
+                    selectedPlan === plan.value ? "primary.50" : "transparent",
+                  transition: "all 0.15s ease",
+                  cursor: "pointer",
+                  "&:hover": {
+                    borderColor: "primary.main",
+                    backgroundColor:
+                      selectedPlan === plan.value ? "primary.100" : "grey.50",
+                  },
+                }}
+                onClick={() => handlePlanSelect(plan.value)}
+              >
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={selectedPlan === plan.value}
+                      onChange={() => handlePlanSelect(plan.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: 1,
+                        width: "100%",
+                      }}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="subtitle2"
+                          fontWeight="600"
+                          sx={{ lineHeight: 1.2 }}
                         >
-                          <Typography
-                            variant="subtitle2"
-                            fontWeight="600"
-                            sx={{ lineHeight: 1.2 }}
-                          >
-                            {plan.name}
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            color="primary"
-                            fontWeight="bold"
-                          >
-                            {plan.price}
-                          </Typography>
-                        </Box>
-                        {plan.popular && (
-                          <Typography
-                            variant="caption"
-                            color="primary"
-                            sx={{
-                              fontWeight: "bold",
-                              display: "inline-block",
-                              mt: 0.5,
-                            }}
-                          >
-                            ★ Popular
-                          </Typography>
-                        )}
+                          {plan.name}
+                        </Typography>
                       </Box>
-                    }
-                    sx={{
-                      width: "100%",
-                      m: 0,
-                      alignItems: "center", // This is key - changed from flex-start to center
-                    }}
-                  />
-                </Box>
-              ))}
-            </Box>
-          </RadioGroup>
+                      <Box sx={{ textAlign: "right" }}>
+                        <Typography
+                          variant="body2"
+                          color="primary"
+                          fontWeight="bold"
+                        >
+                          {plan.price}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  }
+                  sx={{
+                    width: "100%",
+                    m: 0,
+                    alignItems: "center",
+                  }}
+                />
+              </Box>
+            ))}
+          </Box>
 
           {errors.pricing_plan && (
             <FormHelperText error sx={{ mt: 1 }}>
@@ -258,6 +259,7 @@ export default function PricingPlan({
           }}
         >
           <FormGroup>
+            {/* First Checkbox */}
             <FormControlLabel
               control={
                 <Checkbox
@@ -265,18 +267,54 @@ export default function PricingPlan({
                 />
               }
               label={
-                <Typography variant="body1">
-                  I have read, understood, and agree to the Terms & Conditions
-                  and Privacy Policy *
-                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    cursor: "pointer",
+                  }}
+                  onClick={handleTermsTextClick}
+                >
+                  <Typography variant="body1" sx={{ lineHeight: 1.4 }}>
+                    I have read, understood, and agree to the{" "}
+                  </Typography>
+                  <Button
+                    variant="text"
+                    onClick={handleTermsButtonClick}
+                    sx={{
+                      p: 0,
+                      minWidth: "auto",
+                      fontSize: "inherit",
+                      verticalAlign: "baseline",
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                        textDecoration: "none",
+                      },
+                    }}
+                  >
+                    Terms & Conditions and Privacy Policy
+                  </Button>
+                  <Typography variant="body1" sx={{ lineHeight: 1.4 }}>
+                    {" "}
+                    *
+                  </Typography>
+                </Box>
               }
+              sx={{
+                alignItems: "center",
+                m: 0,
+                mb: 2,
+                width: "100%",
+              }}
             />
             {errors.agree_with?.terms_conditions?.i_agree && (
-              <FormHelperText error>
+              <FormHelperText error sx={{ mt: 0.5, ml: 0 }}>
                 {errors.agree_with.terms_conditions.i_agree.message}
               </FormHelperText>
             )}
 
+            {/* Second Checkbox */}
             <FormControlLabel
               control={
                 <Checkbox
@@ -284,15 +322,25 @@ export default function PricingPlan({
                 />
               }
               label={
-                <Typography variant="body1">
+                <Typography
+                  variant="body1"
+                  sx={{
+                    lineHeight: 1.4,
+                    cursor: "pointer",
+                  }}
+                  onClick={handleConfirmTextClick}
+                >
                   I confirm that all information provided is accurate and
                   complete to the best of my knowledge *
                 </Typography>
               }
-              sx={{ mt: 1 }}
+              sx={{
+                alignItems: "center",
+                m: 0,
+              }}
             />
             {errors.agree_with?.terms_conditions?.confirm && (
-              <FormHelperText error>
+              <FormHelperText error sx={{ mt: 0.5, ml: 0 }}>
                 {errors.agree_with.terms_conditions.confirm.message}
               </FormHelperText>
             )}
@@ -306,7 +354,7 @@ export default function PricingPlan({
           Important Update: Financial Statements
         </Typography>
         <Typography variant="body2">
-          Starting soon, Financial Statements will have the following charges:
+          Financial Statements have the following charges:
         </Typography>
         <Box component="ul" sx={{ pl: 2, mt: 1, mb: 0 }}>
           <Typography component="li" variant="body2">
@@ -325,6 +373,7 @@ export default function PricingPlan({
       <Box sx={{ mt: 3 }}>
         <TextField
           {...control.register("digital_sign")}
+          inputRef={digitalSignatureRef}
           label="Digital Signature"
           fullWidth
           required
@@ -332,6 +381,22 @@ export default function PricingPlan({
           placeholder="Type your full name as digital signature"
           helperText="By typing your name, you digitally sign this application"
           error={!!errors.digital_sign}
+          onFocus={(e) => {
+            if (isInitialRender) {
+              e.target.blur();
+            }
+          }}
+          sx={{
+            "& .MuiFilledInput-root": {
+              backgroundColor: "transparent",
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+              "&.Mui-focused": {
+                backgroundColor: "transparent",
+              },
+            },
+          }}
         />
         {errors.digital_sign && (
           <FormHelperText error>{errors.digital_sign.message}</FormHelperText>

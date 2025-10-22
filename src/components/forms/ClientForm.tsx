@@ -20,6 +20,7 @@ import PersonalInfo from "./form-sections/PersonalInfo";
 import BusinessInfo from "./form-sections/BusinessInfo";
 import BankInfo from "./form-sections/BankInfo";
 import PricingPlan from "./form-sections/PricingPlan";
+import TermsModal from "../modals/TermsModal";
 import { IClientForm } from "@/types/client";
 
 interface ClientFormProps {
@@ -60,7 +61,7 @@ const schema = yup.object().shape({
   }),
   bank: yup.object().shape({
     bank_name: yup.string(),
-    bank_account_no: yup.string(),
+    bank_acccount_no: yup.string(),
     bic: yup.string(),
   }),
   pricing_plan: yup.string().required("Please select a pricing plan"),
@@ -80,13 +81,22 @@ const schema = yup.object().shape({
       confirm: yup.boolean().oneOf([true], "You must confirm the agreement"),
     }),
   }),
-  digital_sign: yup.string(),
+  digital_sign: yup.string().required("Digital signature is required"),
 });
 
 export default function ClientForm({ onSuccess }: ClientFormProps) {
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [termsOpen, setTermsOpen] = useState(false);
+
+  const handleOpenTerms = () => {
+    setTermsOpen(true);
+  };
+
+  const handleCloseTerms = () => {
+    setTermsOpen(false);
+  };
 
   const {
     control,
@@ -124,7 +134,7 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
       },
       bank: {
         bank_name: "",
-        bank_account_no: "",
+        bank_acccount_no: "",
         bic: "",
       },
       pricing_plan: "",
@@ -136,8 +146,8 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
         comment: "",
         discount: "",
         terms_conditions: {
-          i_agree: true,
-          confirm: true,
+          i_agree: false,
+          confirm: false,
         },
       },
       digital_sign: "",
@@ -145,7 +155,7 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
   });
 
   const handleNext = async () => {
-    let fields: string[] = [];
+    let fields: (keyof IClientForm | string)[] = [];
 
     switch (activeStep) {
       case 0:
@@ -158,20 +168,32 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
         ];
         break;
       case 1:
-        fields = [
-          "business.company",
-          "business.vat_return_activities",
-          "business.business_start_date",
-        ];
+        fields = ["business.vat_return_activities", "work_contracts"];
+        // Add conditional fields if business type is "yes"
+        const businessType = watch("business.business_type");
+        if (businessType === "yes") {
+          fields.push(
+            "business.business_id",
+            "business.vat_id",
+            "business.company",
+            "business.business_start_date"
+          );
+        }
+        // Add work_contracts_other if "Other" is selected
+        const workContracts = watch("work_contracts") || [];
+        if (workContracts.includes("Other")) {
+          fields.push("work_contracts_other");
+        }
         break;
       case 2:
-        fields = ["bank.bank_name", "bank.bank_account_no", "bank.bic"];
+        fields = ["bank.bank_name", "bank.bank_acccount_no", "bank.bic"];
         break;
       case 3:
         fields = [
           "pricing_plan",
           "agree_with.terms_conditions.i_agree",
           "agree_with.terms_conditions.confirm",
+          "digital_sign",
         ];
         break;
     }
@@ -193,6 +215,16 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
     setSubmitError("");
 
     try {
+      // Prepare the data for API submission
+      const submitData = {
+        ...data,
+        join_date: new Date().toISOString(),
+        status: "pending",
+        client_of: "maas",
+        // Ensure work_contracts is properly formatted
+        work_contracts: data.work_contracts || [],
+      };
+
       // Use your existing API endpoint
       const response = await fetch(
         "https://hisab-nikas.vercel.app/clientapi/maas",
@@ -201,13 +233,7 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...data,
-            // Ensure the data structure matches what your API expects
-            join_date: new Date().toISOString(),
-            status: "pending",
-            client_of: "maas",
-          }),
+          body: JSON.stringify(submitData),
         }
       );
 
@@ -237,7 +263,14 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
       case 0:
         return <PersonalInfo control={control} errors={errors} />;
       case 1:
-        return <BusinessInfo control={control} errors={errors} />;
+        return (
+          <BusinessInfo
+            control={control}
+            errors={errors}
+            watch={watch}
+            setValue={setValue}
+          />
+        );
       case 2:
         return (
           <BankInfo
@@ -254,6 +287,7 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
             errors={errors}
             watch={watch}
             setValue={setValue}
+            onOpenTerms={handleOpenTerms}
           />
         );
       default:
@@ -262,119 +296,126 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
   };
 
   return (
-    <Card>
-      <CardContent sx={{ p: 4 }}>
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{ fontWeight: "bold", mb: 4 }}
-        >
-          Client Enrollment Form
-        </Typography>
+    <>
+      <Card>
+        <CardContent sx={{ p: 4 }}>
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{ fontWeight: "bold", mb: 4 }}
+          >
+            Client Enrollment Form
+          </Typography>
 
-        <Box sx={{ mb: 4 }}>
-          {/* Mobile Progress Indicator */}
-          <Box sx={{ display: { xs: "block", md: "none" }, mb: 3 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 1,
-              }}
-            >
-              <Typography variant="body2" color="text.secondary">
-                Step {activeStep + 1} of {steps.length}
-              </Typography>
-              <Typography
-                variant="body2"
-                fontWeight="medium"
-                color="primary.main"
-              >
-                {steps[activeStep]}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                width: "100%",
-                height: 6,
-                backgroundColor: "grey.200",
-                borderRadius: 3,
-              }}
-            >
+          <Box sx={{ mb: 4 }}>
+            {/* Mobile Progress Indicator */}
+            <Box sx={{ display: { xs: "block", md: "none" }, mb: 3 }}>
               <Box
                 sx={{
-                  height: "100%",
-                  backgroundColor: "primary.main",
-                  borderRadius: 3,
-                  width: `${((activeStep + 1) / steps.length) * 100}%`,
-                  transition: "width 0.3s ease-in-out",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 1,
                 }}
-              />
-            </Box>
-          </Box>
-
-          {/* Desktop Stepper */}
-          <Stepper
-            activeStep={activeStep}
-            sx={{
-              display: { xs: "none", md: "flex" },
-            }}
-          >
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel
-                  sx={{
-                    "& .MuiStepLabel-label": {
-                      fontSize: "0.875rem",
-                      fontWeight: 600,
-                    },
-                  }}
-                >
-                  {label}
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-        </Box>
-
-        {submitError && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {submitError}
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {getStepContent(activeStep)}
-
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-            <Button
-              disabled={activeStep === 0 || isSubmitting}
-              onClick={handleBack}
-              variant="outlined"
-              size="large"
-            >
-              Back
-            </Button>
-
-            {activeStep === steps.length - 1 ? (
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                size="large"
-                disabled={isSubmitting}
               >
-                {isSubmitting ? "Submitting..." : "Submit Application"}
-              </Button>
-            ) : (
-              <Button onClick={handleNext} variant="contained" size="large">
-                Next
-              </Button>
-            )}
+                <Typography variant="body2" color="text.secondary">
+                  Step {activeStep + 1} of {steps.length}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  fontWeight="medium"
+                  color="primary.main"
+                >
+                  {steps[activeStep]}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: 6,
+                  backgroundColor: "grey.200",
+                  borderRadius: 3,
+                }}
+              >
+                <Box
+                  sx={{
+                    height: "100%",
+                    backgroundColor: "primary.main",
+                    borderRadius: 3,
+                    width: `${((activeStep + 1) / steps.length) * 100}%`,
+                    transition: "width 0.3s ease-in-out",
+                  }}
+                />
+              </Box>
+            </Box>
+
+            {/* Desktop Stepper */}
+            <Stepper
+              activeStep={activeStep}
+              sx={{
+                display: { xs: "none", md: "flex" },
+              }}
+            >
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel
+                    sx={{
+                      "& .MuiStepLabel-label": {
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                      },
+                    }}
+                  >
+                    {label}
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
           </Box>
-        </form>
-      </CardContent>
-    </Card>
+
+          {submitError && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {submitError}
+            </Alert>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {getStepContent(activeStep)}
+
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}
+            >
+              <Button
+                disabled={activeStep === 0 || isSubmitting}
+                onClick={handleBack}
+                variant="outlined"
+                size="large"
+              >
+                Back
+              </Button>
+
+              {activeStep === steps.length - 1 ? (
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Application"}
+                </Button>
+              ) : (
+                <Button onClick={handleNext} variant="contained" size="large">
+                  Next
+                </Button>
+              )}
+            </Box>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* Terms Modal */}
+      <TermsModal open={termsOpen} onClose={handleCloseTerms} />
+    </>
   );
 }

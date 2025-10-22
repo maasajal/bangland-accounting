@@ -9,9 +9,8 @@ import {
   Button,
   Typography,
   Box,
-  Alert,
 } from "@mui/material";
-import { CheckCircle, Celebration, Email } from "@mui/icons-material";
+import { CheckCircle, Celebration } from "@mui/icons-material";
 
 interface SuccessModalProps {
   open: boolean;
@@ -35,7 +34,7 @@ export default function SuccessModal({ open, onClose }: SuccessModalProps) {
         </Box>
         <Typography
           variant="h4"
-          component="h2"
+          component="h4"
           sx={{ fontWeight: "bold", color: "success.main" }}
         >
           Application Submitted!
