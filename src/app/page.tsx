@@ -187,7 +187,7 @@ export default function HomePage() {
           <Grid container spacing={6} alignItems="center">
             <Grid item xs={12} md={6}>
               <Chip
-                label="🚀 Trusted by 450+ Entrepreneurs"
+                label="🚀 Trusted by 450+ Entrepreneurs & Riders"
                 sx={{
                   bgcolor: alpha("#ffffff", 0.2),
                   color: "white",
@@ -202,10 +202,11 @@ export default function HomePage() {
                   fontSize: { xs: "2.5rem", md: "3.5rem" },
                 }}
               >
-                Start Your Business in Finland with{" "}
+                Made for{" "}
                 <Box component="span" sx={{ color: "#fbbf24" }}>
-                  Confidence
-                </Box>
+                  Wolt & Foodora Riders
+                </Box>{" "}
+                in Finland
               </Typography>
               <Typography
                 variant="h5"
@@ -215,10 +216,30 @@ export default function HomePage() {
                   fontWeight: 400,
                 }}
               >
-                All-in-one business setup and accounting services designed for
-                entrepreneurs. Fast, affordable, and 100% compliant with Finnish
-                regulations.
+                {/* Updated description */}
+                As a delivery rider with 6+ years experience in Finland, I
+                understand your needs. All-in-one business setup and accounting
+                services designed specifically for riders. Fast, affordable, and
+                100% compliant with Finnish regulations.
               </Typography>
+
+              {/* Special note for riders */}
+              <Box
+                sx={{
+                  bgcolor: alpha("#fbbf24", 0.1),
+                  border: "1px solid rgba(251, 191, 36, 0.3)",
+                  borderRadius: 2,
+                  p: 2,
+                  mb: 3,
+                }}
+              >
+                <Typography variant="body1" sx={{ fontStyle: "italic" }}>
+                  💡 <strong>Special offer for riders:</strong> Get your
+                  business started while continuing your delivery work. We speak
+                  your language and understand your schedule!
+                </Typography>
+              </Box>
+
               <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
                 <Button
                   variant="contained"
@@ -231,7 +252,7 @@ export default function HomePage() {
                     "&:hover": { bgcolor: "#d97706" },
                   }}
                 >
-                  Start Your Journey
+                  Start Your Business Journey
                 </Button>
                 <Button
                   variant="outlined"
@@ -267,26 +288,53 @@ export default function HomePage() {
                   sx={{ display: "flex", alignItems: "center", gap: 1 }}
                 >
                   <Star sx={{ color: "#fbbf24" }} />
-                  Why Choose Us?
+                  Why Riders Choose Us?
                 </Typography>
                 <List>
                   <ListItem>
                     <ListItemIcon sx={{ minWidth: 40, color: "#fbbf24" }}>
                       <CheckCircle />
                     </ListItemIcon>
-                    <ListItemText primary="English & Bangla speaking experts, Basic Hindi" />
+                    <ListItemText
+                      primary="Founded by a fellow rider with 6+ years experience"
+                      secondary="I've been in your shoes - I know the challenges you face"
+                    />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon sx={{ minWidth: 40, color: "#fbbf24" }}>
                       <CheckCircle />
                     </ListItemIcon>
-                    <ListItemText primary="Fixed monthly pricing - no surprises" />
+                    <ListItemText
+                      primary="Perfect for Wolt & Foodora riders"
+                      secondary="Services tailored to delivery platform requirements"
+                    />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon sx={{ minWidth: 40, color: "#fbbf24" }}>
                       <CheckCircle />
                     </ListItemIcon>
-                    <ListItemText primary="Fast 24-hour response time" />
+                    <ListItemText
+                      primary="Flexible payment plans"
+                      secondary="Affordable pricing that works with rider income"
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon sx={{ minWidth: 40, color: "#fbbf24" }}>
+                      <CheckCircle />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="English & Bangla speaking experts, Basic Hindi"
+                      secondary="Communication in languages you're comfortable with"
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemIcon sx={{ minWidth: 40, color: "#fbbf24" }}>
+                      <CheckCircle />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Fast 24-hour response time"
+                      secondary="We work around your delivery schedule"
+                    />
                   </ListItem>
                 </List>
               </Box>

@@ -60,7 +60,7 @@ export default function InfoSection({ onOpenTerms }: InfoSectionProps) {
   ];
 
   const contactInfo = [
-    { method: "WhatsApp", details: "+358449415458" },
+    { method: "WhatsApp", details: "+358449304321" },
     {
       method: "Website",
       details: "form.quickaccount.fi",

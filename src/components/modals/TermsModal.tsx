@@ -210,7 +210,7 @@ export default function TermsModal({ open, onClose }: TermsModalProps) {
         <Box sx={{ mt: 4, p: 3, backgroundColor: "grey.50", borderRadius: 2 }}>
           <Typography variant="body2" sx={{ fontStyle: "italic" }}>
             For questions about these terms, please contact us at
-            be.quickac@gmail.com or WhatsApp: +358449415458.
+            bangland.ac@gmail.com or WhatsApp: +358449304321.
           </Typography>
         </Box>
       </DialogContent>
