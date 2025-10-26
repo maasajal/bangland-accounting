@@ -105,6 +105,7 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
     trigger,
     watch,
     setValue,
+    reset,
   } = useForm<IClientForm>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -241,6 +242,8 @@ export default function ClientForm({ onSuccess }: ClientFormProps) {
 
       if (response.ok) {
         onSuccess();
+        reset();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         setSubmitError(
           result.message ||

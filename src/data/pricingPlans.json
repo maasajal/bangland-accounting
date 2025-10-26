@@ -5,7 +5,7 @@
       "name": "Most wanted Light & Startup Entrepreneur",
       "label": "Most wanted Light & Startup Entrepreneur",
       "price": "€30",
-      "period": "/month + 25.5% ALV",
+      "period": "/KK + 25.5% ALV",
       "description": "Yearly subscription (Best value)",
       "popular": true,
       "features": [
@@ -26,7 +26,7 @@
       "name": "Light & Startup Entrepreneur",
       "label": "Light & Startup Entrepreneur",
       "price": "€39",
-      "period": "/month + 25.5% ALV",
+      "period": "/KK + 25.5% ALV",
       "description": "Monthly subscription (Cancel anytime)",
       "popular": false,
       "features": [
@@ -85,7 +85,7 @@
       "name": "For Taxi Drivers",
       "label": "For Taxi driver",
       "price": "€49",
-      "period": "/month + 25.5% ALV",
+      "period": "/KK + 25.5% ALV",
       "description": "Fixed monthly price",
       "popular": false,
       "features": [
@@ -105,7 +105,7 @@
       "name": "Limited Company (Up to €100K)",
       "label": "Limited Liability Company (Up to €100K Turnover)",
       "price": "€49-99",
-      "period": "/month + 25.5% ALV",
+      "period": "/KK + 25.5% ALV",
       "description": "Depending on company status and sales turnover",
       "popular": false,
       "features": [
@@ -125,7 +125,7 @@
       "name": "Limited Company (Over €100K)",
       "label": "Limited Liability Company (Over €100K Turnover)",
       "price": "€99-199",
-      "period": "/month + 25.5% ALV",
+      "period": "/KK + 25.5% ALV",
       "description": "Depending on company status and sales turnover",
       "popular": false,
       "features": [
